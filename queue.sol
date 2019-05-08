@@ -36,9 +36,20 @@ contract Deque {
 
 contract Queue {
 
+
+
+    mapping (address => Patient) receptionists;
+    address[] public receptionistAccts;
+
+    struct Patient {
+        string name;
+        int value1;
+    }
+
     mapping(uint256 => string) queue;
     uint256 first = 1;
     uint256 last = 0;
+    uint256 size = 0;
 
     function greet() public returns (string greet) {
         greet = "Dada";
@@ -46,6 +57,7 @@ contract Queue {
 
     function enqueue(string memory data) public {
         last += 1;
+        size += 1;
         queue[last] = data;
     }
 
@@ -56,9 +68,28 @@ contract Queue {
 
         delete queue[first];
         first += 1;
+        size -= 1;
     }
+
+    function lenght() public returns(uint256) {
+        return size;
+    }
+
+    function get_patient(uint256 position) public returns(string) {
+        return queue[position];
+    }
+
 }
 
 contract MedicalQueue is Queue {
+
+    address creator;
+    mapping(address => string) roles;
+
+    constructor() public {
+        creator = msg.sender;
+    }
+
+
 
 }

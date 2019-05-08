@@ -44,13 +44,13 @@ w3.eth.defaultAccount = w3.eth.accounts[0]
 
 print(w3.version.node)
 
-contract_source_path = 'queue.sol'
 compiled_sol = compile_source_file('./queue.sol')
 
 contract_id, contract_interface = compiled_sol.popitem()
 
 address = deploy_contract(w3, contract_interface)
 print("Deployed {0} to: {1}\n".format(contract_id, address))
+print("address {0} \n ABI: {1}\n".format(address, contract_interface['abi']))
 
 queue = w3.eth.contract(
     address=address,
@@ -61,9 +61,13 @@ print('Default contract greeting: {}'.format(
     queue.functions.greet().call()
 ))
 
+
+
 tx_hash = queue.functions.enqueue("ddd").transact()
 # Wait for transaction to be mined...
 w3.eth.waitForTransactionReceipt(tx_hash)
+
+print('Size: {}'.format(queue.functions.lenght().call()))
 
 print('Default contract greeting: {}'.format(
     queue.functions.dequeue().call()
