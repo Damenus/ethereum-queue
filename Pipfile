@@ -7,6 +7,10 @@ name = "pypi"
 web3 = "*"
 py-solc = "*" # wrapper to solc, soldity compiler
 eth-testrpc = "*"
+py-solcx = "*"
+pickle = "*"
+web3 = "*"
+flask = "*"
 
 [dev-packages]
 pex = "==1.6.3"
