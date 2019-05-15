@@ -52,7 +52,7 @@ contract Queue {
     uint256 size = 0;
 
     function greet() public returns (string greet) {
-        greet = "Dada";
+        greet = "Hello World!";
     }
 
     function enqueue(string memory data) public {

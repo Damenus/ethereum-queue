@@ -7,6 +7,10 @@
 {% block body %}
     {{ super() }}
 
+     <form action = "/remove_first_patient" method = "POST">
+        <p><input type = "submit" value = "Remove first patient" /></p>
+    </form>
+
     <ul>
         {% for patient in patients %}
         <li>{{ patient }}</li>

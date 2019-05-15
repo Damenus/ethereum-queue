@@ -1,6 +1,7 @@
 import sys
 import time
 import pprint
+import pickle # save to list
 
 # from web3.auto.gethdev import w3
 from web3 import Web3, IPCProvider
@@ -52,6 +53,32 @@ address = deploy_contract(w3, contract_interface)
 print("Deployed {0} to: {1}\n".format(contract_id, address))
 print("address {0} \n ABI: {1}\n".format(address, contract_interface['abi']))
 
+# Write ABI and address to file
+with open('ABI.txt', 'wb') as fp:
+    pickle.dump(contract_interface['abi'], fp)
+
+f = open("address.txt", "w")
+f.write(address)
+f.close()
+
+# Create users
+
+# this generate address + private key but not add to node
+# myAccount = w3.eth.account.create('entropy')
+# myAddress = myAccount.address
+# myPrivateKey = myAccount.privateKey
+# print('my address is     : {}'.format(myAccount.address))
+# print('my private key is : {}'.format(myAccount.privateKey.hex()))
+
+# Add new addres and keep private_key in node
+my_address = w3.personal.newAccount("pass")
+print('Accounst: {}'.format(w3.personal.listAccounts))
+
+w3.eth.sendTransaction({'to': my_address, 'from': w3.eth.coinbase, 'value': 1})
+print('Address {} Money {}'.format(my_address, w3.eth.getBalance(my_address)))
+
+
+# Test
 queue = w3.eth.contract(
     address=address,
     abi=contract_interface['abi']
@@ -61,14 +88,11 @@ print('Default contract greeting: {}'.format(
     queue.functions.greet().call()
 ))
 
-
-
-tx_hash = queue.functions.enqueue("ddd").transact()
-# Wait for transaction to be mined...
+tx_hash = queue.functions.enqueue("Damian").transact()
 w3.eth.waitForTransactionReceipt(tx_hash)
 
 print('Size: {}'.format(queue.functions.lenght().call()))
 
-print('Default contract greeting: {}'.format(
+print('First test user: {}'.format(
     queue.functions.dequeue().call()
 ))
