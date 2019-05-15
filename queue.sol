@@ -47,7 +47,7 @@ contract Queue {
     }
 
     mapping(uint256 => string) queue;
-    uint256 first = 1;
+    uint256 first = 0;
     uint256 last = 0;
     uint256 size = 0;
 
@@ -75,7 +75,16 @@ contract Queue {
         return size;
     }
 
+    function end() public returns(uint256) {
+        return last;
+    }
+
+    function start() public returns(uint256) {
+        return first;
+    }
+
     function get_patient(uint256 position) public returns(string) {
+        require(size > 0);
         return queue[position];
     }
 

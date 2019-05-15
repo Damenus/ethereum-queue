@@ -31,7 +31,7 @@ def connect_to_blockchain():
     return w3, queue
 
 def add_patient_to_queue(patient):
-    w3.personal.unlockAccount('0x8E91F458978FFD2BBD77709ce9726fC1e9eA7a62', 'pass')
+    # w3.personal.unlockAccount('0x8E91F458978FFD2BBD77709ce9726fC1e9eA7a62', 'pass')
     tx_hash = queue.functions.enqueue(patient).transact()
     # Wait for transaction to be mined...
     w3.eth.waitForTransactionReceipt(tx_hash)
@@ -40,9 +40,12 @@ def add_patient_to_queue(patient):
 def read_all_patient():
     patients = []
     lenght = queue.functions.lenght().call()
+    last = queue.functions.end().call()
+    first = queue.functions.start().call()
     print(lenght)
 
-    for i in range(lenght+1):
+    #for i in range(lenght - last + 1,lenght+1):
+    for i in range(first+1,last+1):
         patients.append(queue.functions.get_patient(i).call())
 
     return patients
@@ -50,7 +53,8 @@ def read_all_patient():
 def remove_first_patient():
     tx_hash = queue.functions.dequeue().transact()
     # Wait for transaction to be mined...
-    w3.eth.waitForTransactionReceipt(tx_hash)
+    removed_patient = w3.eth.waitForTransactionReceipt(tx_hash)
+    print(removed_patient)
 
 @app.route('/')
 def index():
@@ -87,7 +91,7 @@ def remove_first_patient_form():
 
 w3, queue = connect_to_blockchain()
 # print(w3.eth.accounts[0])
-w3.eth.defaultAccount = '0x8E91F458978FFD2BBD77709ce9726fC1e9eA7a62' # w3.eth.accounts[0]
+w3.eth.defaultAccount = w3.eth.accounts[0]
 greeting()
 
 app.run(host='0.0.0.0', port=5000)
