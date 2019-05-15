@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+ {% block head %}
+    <meta charset="UTF-8">
+    <title>{% block title %}{% endblock %}</title>
+ {% endblock %}
+</head>
+<body>
+    <h1>MedQueue</h1>
+
+    <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/list_patients">List all patients</a></li>
+        <li><a href="/add_patient">Add patient</a></li>
+    </ul>
+ {% block body %}{% endblock %}
+</body>
+</html>

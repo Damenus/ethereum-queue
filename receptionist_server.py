@@ -34,13 +34,34 @@ def read_all_patient():
 
     return patients
 
+@app.route('/')
+def index():
+    return render_template('index.html', node_identifier=1, node_money=1), 200
+
+@app.route('/list_patients', methods=['GET'])
+def list_patients():
+    return render_template('list_patients.html', patients=read_all_patient()), 200
+
+@app.route('/add_patient', methods=['GET'])
+def add_patient_form():
+    return render_template('add_patient.html'), 200
+
+@app.route('/add_patient', methods=['POST'])
+def add_patient():
+    values = request.form
+
+    # Check that the required fields are in the POST'ed data
+    required = ['patient_name']
+    if not all(k in values for k in required):
+        return 'Missing values', 400
+
+    patient_name = values['patient_name']
+    add_patient_to_queue(patient_name)
+
+    return render_template('index.html', response='OK'), 201
+
 
 w3, queue = connect_to_blockchain()
-
 w3.eth.defaultAccount = w3.eth.accounts[0]
-Account.create()
 
-add_patient_to_queue("Damian")
-add_patient_to_queue("Kasia")
-print(read_all_patient())
-
+app.run(host='0.0.0.0', port=5000)

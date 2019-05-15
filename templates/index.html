@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %} Index {% endblock %}
+{% block head %}
+ {{ super() }}
+{% endblock %}
+
+{% block body %}
+    {{ super() }}
+
+
+{% if response is defined %}
+    {{ response['message'] }}
+{% endif %}
+
+{% endblock %}
