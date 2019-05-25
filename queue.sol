@@ -1,50 +1,14 @@
 pragma solidity >=0.4.22 <0.6.0;
 
-contract Deque {
-    mapping(uint256 => bytes) deque;
-    uint256 first = 2**255;
-    uint256 last = first - 1;
-
-    function pushLeft(bytes memory data) public {
-        first -= 1;
-        deque[first] = data;
-    }
-
-    function pushRight(bytes memory data) public {
-        last += 1;
-        deque[last] = data;
-    }
-
-    function popLeft() public returns (bytes memory data) {
-        require(last >= first);  // non-empty deque
-
-        data = deque[first];
-
-        delete deque[first];
-        first += 1;
-    }
-
-    function popRight() public returns (bytes memory data) {
-        require(last >= first);  // non-empty deque
-
-        data = deque[last];
-
-        delete deque[last];
-        last -= 1;
-    }
-}
-
 contract Queue {
 
-
-
     mapping (address => Patient) receptionists;
-    address[] public receptionistAccts;
 
     struct Patient {
         string name;
         int value1;
     }
+
 
     mapping(uint256 => string) queue;
     uint256 first = 0;
@@ -92,13 +56,32 @@ contract Queue {
 
 contract MedicalQueue is Queue {
 
-    address creator;
-    mapping(address => string) roles;
+    address public owner;
+    enum Role {OTHER,RECEPTIONIST,DOCTOR}
+    mapping(address => Role) roles;
+
+    modifier onlyByAddress(address _account) {
+        require(
+            msg.sender == _account,
+            "Sender not authorized."
+        );
+        _;
+    }
+
+    modifier onlyByRole(Role _role) {
+        require(
+            roles[msg.sender] == _role,
+            "Sender not authorized."
+        );
+        _;
+    }
 
     constructor() public {
         creator = msg.sender;
     }
 
-
+    function add_doctor(address _account) public return(bool success) {
+        roles[_account] = Role.DOCTOR;
+    }
 
 }
