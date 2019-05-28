@@ -29,6 +29,7 @@ contract MedicalQueue {
     }
 
     uint numberDoctors = 0;
+    uint numberPatients = 0;
 
     function add_doctor(address _account, string memory _name) public onlyByAddress(owner) returns(bool success) {
         roles[_account] = Role.DOCTOR;
@@ -80,10 +81,11 @@ contract MedicalQueue {
     address[] doctorList;
 
 
-    function newPatient(uint idPatient, address addressDoctor, string memory namePatient) public returns(bool success) {
-        patientStructs[idPatient].namePatient = namePatient;
-        patientStructs[idPatient].addressDoctor.push(addressDoctor);
-        patientStructs[idPatient].listPointer.push(doctorListStruct[addressDoctor].patients.push(idPatient) - 1);
+    function newPatient(address addressDoctor, string memory namePatient) public returns(bool success) {
+        patientStructs[numberPatients].namePatient = namePatient;
+        patientStructs[numberPatients].addressDoctor.push(addressDoctor);
+        patientStructs[numberPatients].listPointer.push(doctorListStruct[addressDoctor].patients.push(numberPatients) - 1);
+        numberPatients++;
         return true;
     }
 
