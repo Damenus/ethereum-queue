@@ -152,6 +152,13 @@ add_patient(doctor1, "Basia3")
 add_patient(doctor1, "Basia4")
 add_patient(doctor1, "Basia5")
 
+def add_visit(idPatient, addressDoctor, idVisit):
+    tx_hash = queue.functions.addVisitToPatient(idPatient, addressDoctor, idVisit).transact()
+    w3.eth.waitForTransactionReceipt(tx_hash)
+
+add_visit(1, doctor2, 1);
+add_visit(2, doctor2, 1);
+
 def get_patients():
     number_doctors = queue.functions.getNumberDoctors().call()
 
@@ -174,12 +181,12 @@ def delete_first_patient(address_doctor):
     tx_hash = queue.functions.deleteFirstPatient(address_doctor).transact()
     w3.eth.waitForTransactionReceipt(tx_hash)
 
-def delete_patient(id):
-    tx_hash = queue.functions.deletePatient(id).transact()
+def delete_patient(address_doctor,id):
+    tx_hash = queue.functions.deletePatient2(address_doctor, id).transact()
     w3.eth.waitForTransactionReceipt(tx_hash)
 
 delete_first_patient(doctor1)
-delete_patient(2);
+delete_patient(doctor1,2);
 get_patients()
 
 # tx_hash = queue.functions.enqueue("Damian").transact()

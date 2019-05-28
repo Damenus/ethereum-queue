@@ -93,7 +93,50 @@ contract MedicalQueue {
         name = patientStructs[idPatient].namePatient;
     }
 
+    function deletePatient2(address addressDoctor, uint idPatient) public returns(bool success) {
+        uint id = 0; // ktory na liscu jest lekarz w zabiegu
+        for(uint x = 0; x < patientStructs[idPatient].addressDoctor.length; x++) {
+            if(patientStructs[idPatient].addressDoctor[x] == addressDoctor) {
+                id = x;
+                break;
+            }
+        }
+
+        address doctorListToDelete = patientStructs[idPatient].addressDoctor[id];
+        uint patientToDelete = patientStructs[idPatient].listPointer[id];
+
+        // nadpisz w kolejce do lekarza pacjenta
+        uint last = doctorListStruct[doctorListToDelete].patients.length - 1;
+        uint current = patientToDelete;
+
+        while( current < last) {
+            doctorListStruct[doctorListToDelete].patients[current] = doctorListStruct[doctorListToDelete].patients[current+1];
+            patientStructs[doctorListStruct[doctorListToDelete].patients[current]].listPointer[id] = current;
+            current++;
+        }
+        doctorListStruct[doctorListToDelete].patients.length--;
+        ///
+
+        //napisz u pacjenta lekarza
+        last = patientStructs[idPatient].addressDoctor.length - 1;
+        current = id;
+
+
+        while( current < last) {
+            patientStructs[idPatient].addressDoctor[current] = patientStructs[idPatient].addressDoctor[current+1];
+            patientStructs[idPatient].listPointer[current] = patientStructs[idPatient].listPointer[current+1];
+            current++;
+        }
+        patientStructs[idPatient].listPointer.length - 1;
+        patientStructs[idPatient].addressDoctor.length - 1;
+        ///
+
+        //delete patientStructs[idPatient];
+        return true;
+    }
+
     function deletePatient(uint idPatient) public returns(bool success) {
+
         address doctorListToDelete = patientStructs[idPatient].addressDoctor[0];
         uint patientToDelete = patientStructs[idPatient].listPointer[0];
 
@@ -112,8 +155,10 @@ contract MedicalQueue {
     }
 
     function deleteFirstPatient(address addressDoctor) public returns(bool success) {
+
+        //test ktorego usunac
         uint idPatient = doctorListStruct[addressDoctor].patients[0];
-        deletePatient(idPatient);
+        deletePatient2(addressDoctor, idPatient);
         return true;
     }
 
@@ -122,8 +167,14 @@ contract MedicalQueue {
     }
 
     function addVisitToPatient(uint idPatient, address addressDoctor, uint idVisit) public returns(bool success) {
-        patientStructs[idPatient].addressDoctor.length;
+        //patientStructs[idPatient].addressDoctor.length;
+//        patientStructs[idPatient].addressDoctor.push(addressDoctor);
+//        uint number_patients = doctorListStruct[addressDoctor].patients.length;
+//        patientStructs[idPatient].listPointer.push(number_patients);
+        patientStructs[idPatient].addressDoctor.push(addressDoctor);
+        patientStructs[idPatient].listPointer.push(doctorListStruct[addressDoctor].patients.push(idPatient) - 1);
 
+        // trzeba whila i wstawić w dobre miejsce
 
         return true;
     }
