@@ -1,4 +1,5 @@
-pragma solidity ^0.5.1;
+pragma solidity >=0.4.22 <0.6.0;
+
 
 contract MedicalQueue {
 
@@ -33,6 +34,7 @@ contract MedicalQueue {
         roles[_account] = Role.DOCTOR;
         doctorListStruct[_account].nameDoctor = _name;
         doctorListStruct[_account].listPointer = numberDoctors;
+        doctorList.push(_account);
         numberDoctors += 1;
         return true;
     }
@@ -43,8 +45,17 @@ contract MedicalQueue {
     }
 
 
-    function getDoctor(address _account) public returns(string memory name_) {
+    function getDoctorByAddress(address _account) public returns(string memory name_) {
         name_ = doctorListStruct[_account].nameDoctor;
+    }
+
+    function getDoctorById(uint _id) public returns(string memory name_, address doctor_address) {
+        doctor_address = doctorList[_id];
+        name_ = doctorListStruct[doctor_address].nameDoctor;
+    }
+
+    function getNumberDoctors() public returns(uint){
+        return numberDoctors;
     }
 
     function greet() public returns (string memory greet) {
@@ -57,21 +68,28 @@ contract MedicalQueue {
         uint[] listPointer;
     }
 
-    mapping(uint => PatientStruct) public patientStructs;
-    mapping(address => DoctorStruct) public doctorListStruct;
 
     struct DoctorStruct {
         string nameDoctor;
         uint[] patients;
         uint listPointer;
-   }
+    }
+
+    mapping(uint => PatientStruct) public patientStructs;
+    mapping(address => DoctorStruct) public doctorListStruct;
+    address[] doctorList;
+
 
     function newPatient(uint idPatient, address addressDoctor, string memory namePatient) public returns(bool success) {
         patientStructs[idPatient].namePatient = namePatient;
-        patientStructs[idPatient].addressDoctor[0] = addressDoctor;
-        patientStructs[idPatient].listPointer[0] = doctorListStruct[addressDoctor].patients.push(idPatient) - 1;
+        patientStructs[idPatient].addressDoctor.push(addressDoctor);
+        patientStructs[idPatient].listPointer.push(doctorListStruct[addressDoctor].patients.push(idPatient) - 1);
         return true;
-   }
+    }
+
+    function getPatient(uint idPatient) public returns(string memory name) {
+        name = patientStructs[idPatient].namePatient;
+    }
 
     function deletePatient(uint idPatient) public returns(bool success) {
         address doctorListToDelete = patientStructs[idPatient].addressDoctor[0];
@@ -89,17 +107,24 @@ contract MedicalQueue {
 
         delete patientStructs[idPatient];
         return true;
-  }
+    }
 
-  function deleteFirstPatient(address addressDoctor) public returns(bool success) {
-      uint idPatient = doctorListStruct[addressDoctor].patients[0];
-      deletePatient(idPatient);
-      return true;
-  }
+    function deleteFirstPatient(address addressDoctor) public returns(bool success) {
+        uint idPatient = doctorListStruct[addressDoctor].patients[0];
+        deletePatient(idPatient);
+        return true;
+    }
 
     function getDoctrorPatients(address addressDoctor) public view returns(uint[] memory) {
-         return doctorListStruct[addressDoctor].patients;
-  }
+        return doctorListStruct[addressDoctor].patients;
+    }
+
+    function addVisitToPatient(uint idPatient, address addressDoctor, uint idVisit) public returns(bool success) {
+        patientStructs[idPatient].addressDoctor.length;
+
+
+        return true;
+    }
 
 
 }
