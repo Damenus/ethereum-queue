@@ -23,7 +23,6 @@ apt-get update
 apt-get install ethereum geth python3.6 python3.6-dev python3.6-pip wget
 pip install py-solc
 pip install py-solc-x
-pip install -r requirements.txt
 python -m solc.install v0.4.25
 # python need older version solc in version v0.4.25; 1.05.19
 # DO NOT! apt-get install solc 

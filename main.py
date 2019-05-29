@@ -2,6 +2,7 @@ import sys
 import time
 import pprint
 import pickle # save to list
+from flask import Flask, jsonify, request, render_template
 
 # from web3.auto.gethdev import w3
 from web3 import Web3, IPCProvider
@@ -157,7 +158,25 @@ def add_visit(idPatient, addressDoctor, idVisit):
     w3.eth.waitForTransactionReceipt(tx_hash)
 
 add_visit(1, doctor2, 1);
+add_patient(doctor2, "BasiaDoctor2")
 add_visit(2, doctor2, 1);
+
+def delete_first_patient(address_doctor):
+    tx_hash = queue.functions.deleteFirstPatient(address_doctor).transact()
+    w3.eth.waitForTransactionReceipt(tx_hash)
+
+def delete_first_patientB(address_doctor):
+    tx_hash = queue.functions.deleteFirstPatientB(address_doctor).transact()
+    w3.eth.waitForTransactionReceipt(tx_hash)
+
+def get_next_patient(address_doctor):
+    tx_hash = queue.functions.getNextPatient(address_doctor).call()
+    #w3.eth.waitForTransactionReceipt(tx_hash)
+    return  tx_hash
+
+def delete_patient(address_doctor,id):
+    tx_hash = queue.functions.deletePatient2(address_doctor, id).transact()
+    w3.eth.waitForTransactionReceipt(tx_hash)
 
 def get_patients():
     number_doctors = queue.functions.getNumberDoctors().call()
@@ -165,29 +184,52 @@ def get_patients():
     doctors = []
     for doctor_id in range(number_doctors):
         name, address = queue.functions.getDoctorById(doctor_id).call()
-        patients =  queue.functions.getDoctrorPatients(address).call()
-        patients_name = []
-        for patient in patients:
-            patients_name.append(queue.functions.getPatient(patient).call())
-        doctors.append({'name': name, 'address': address, 'patients': patients, 'patients_name': patients_name})
+        patients_id =  queue.functions.getDoctrorPatients(address).call()
+        patients = []
+        for patient in patients_id:
+            patients.append({'id': patient, 'patients_name':queue.functions.getPatient(patient).call()})
+        doctors.append({'name': name, 'address': address, 'patients': patients,
+                        'next_patient': get_next_patient(address)})
 
 
     print(doctors)
+    return doctors
 
 get_patients()
 
 
-def delete_first_patient(address_doctor):
-    tx_hash = queue.functions.deleteFirstPatient(address_doctor).transact()
-    w3.eth.waitForTransactionReceipt(tx_hash)
 
-def delete_patient(address_doctor,id):
-    tx_hash = queue.functions.deletePatient2(address_doctor, id).transact()
-    w3.eth.waitForTransactionReceipt(tx_hash)
-
-delete_first_patient(doctor1)
-delete_patient(doctor1,2);
+#delete_first_patient(doctor1)
+#delete_patient(doctor1,2);
+delete_first_patientB(doctor2)
 get_patients()
+
+app = Flask(__name__, template_folder='./templates')
+
+@app.route('/')
+def index():
+    return render_template('index.html', queue=get_patients(), user=w3.eth.defaultAccount, accounts=[doctor1,doctor2,receptionist]), 200
+
+
+@app.route('/set_user', methods=['POST'])
+def add_patient():
+    values = request.form
+
+    # Check that the required fields are in the POST'ed data
+    required = ['user']
+    if not all(k in values for k in required):
+        return 'Missing values', 400
+
+    user = values['user']
+
+    w3.eth.defaultAccount = user
+    # w3.personal.unlockAccount(w3.personal.listAccounts[0], "", 15000)
+    #add_patient_to_queue(patient_name)
+
+    return render_template('index.html', queue=get_patients(), user=w3.eth.defaultAccount, accounts=[doctor1,doctor2,receptionist]), 201
+
+app.run(host='0.0.0.0', port=5000)
+
 
 # tx_hash = queue.functions.enqueue("Damian").transact()
 # w3.eth.waitForTransactionReceipt(tx_hash)

@@ -7,6 +7,30 @@
 {% block body %}
     {{ super() }}
 
+    {{ user }}
+
+    <form action="/set_user" method="POST" >
+        <select name="user" onchange="this.form.submit()">
+            {% for account in accounts %}
+            <option value='{{account}}'>{{ account }}</option>
+            {% endfor %}
+         </select>
+    </form>
+
+
+    {% for doctor in queue %}
+    {{doctor.name}}
+
+
+    <ul>
+        {% for patient in doctor.patients %}
+        <li {% if patient.id == doctor.next_patient %} style="color:red;" {% endif %}>
+            {{ patient.patients_name }}
+        </li>
+        {% endfor %}
+    </ul>
+    {% endfor %}
+
 
 {% if response is defined %}
     {{ response['message'] }}
