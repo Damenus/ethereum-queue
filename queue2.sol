@@ -163,7 +163,7 @@ contract MedicalQueue {
     }
 
     function deleteFirstPatientB(address addressDoctor) public returns(bool success) {
-
+        require(addressDoctor == msg.sender);
         uint idPatient = 0;
         for(uint i=0; i < doctorListStruct[addressDoctor].patients.length; i++){
             idPatient = doctorListStruct[addressDoctor].patients[i];
@@ -176,16 +176,18 @@ contract MedicalQueue {
         return true;
     }
 
-    function getNextPatient(address addressDoctor) public returns(uint idPatient) {
-
-        idPatient = 0;
+    function getNextPatient(address addressDoctor) public returns(uint) {
+        require(doctorListStruct[addressDoctor].patients.length > 0, '0');
+        uint idPatient = 0;
+        uint nextPatient = doctorListStruct[addressDoctor].patients[0];
         for(uint i=0; i < doctorListStruct[addressDoctor].patients.length; i++){
             idPatient = doctorListStruct[addressDoctor].patients[i];
             if(patientStructs[idPatient].addressDoctor[0] == addressDoctor) {
+                nextPatient = idPatient;
                 break;
             }
         }
-
+        return nextPatient;
     }
 
     function getDoctrorPatients(address addressDoctor) public view returns(uint[] memory) {

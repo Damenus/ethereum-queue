@@ -90,35 +90,41 @@ print('Default contract greeting: {}'.format(
     queue.functions.greet().call()
 ))
 
+doctors = []
+receptionists = []
+ADMIN = w3.eth.accounts[0]
 
 def create_doctor(name):
     # Create account
     doctor = w3.personal.newAccount("pass")
     # Send money
-    tx_hash = w3.eth.sendTransaction({'to': doctor, 'from': w3.eth.coinbase, 'value': 10})
+    tx_hash = w3.eth.sendTransaction({'to': doctor, 'from': w3.eth.coinbase, 'value': w3.toWei(100, "ether")})
     w3.eth.waitForTransactionReceipt(tx_hash)
     # Add account to list doctors
     tx_hash = queue.functions.add_doctor(doctor, name).transact()
     w3.eth.waitForTransactionReceipt(tx_hash)
     print('New doctor {} Address {} Money {}'.format(name, doctor, w3.eth.getBalance(doctor)))
+    doctors.append({'name':name,'address':doctor})
     return doctor
 
-def create_receptionist():
+def create_receptionist(name):
     # Create account
     receptionist = w3.personal.newAccount("pass")
     # Send money
-    tx_hash = w3.eth.sendTransaction({'to': receptionist, 'from': w3.eth.coinbase, 'value': 1000})
+    tx_hash = w3.eth.sendTransaction({'to': receptionist, 'from': w3.eth.coinbase, 'value': w3.toWei(100, "ether")})
     w3.eth.waitForTransactionReceipt(tx_hash)
     # Add account to list recepionist
     tx_hash = queue.functions.add_receptionist(receptionist).transact()
     w3.eth.waitForTransactionReceipt(tx_hash)
     print('New receptionist Address {} Money {}'.format(receptionist, w3.eth.getBalance(receptionist)))
+    receptionists.append({'name':name,'address':receptionist})
     return receptionist
 
 
 doctor1 = create_doctor("Damian")
 doctor2 = create_doctor("Grzegorz")
-receptionist = create_receptionist()
+doctor3 = create_doctor("Marcin")
+receptionist = create_receptionist("Recp1")
 print('Accounst: {}'.format(w3.personal.listAccounts))
 
 
@@ -201,18 +207,38 @@ get_patients()
 
 #delete_first_patient(doctor1)
 #delete_patient(doctor1,2);
-delete_first_patientB(doctor2)
+w3.eth.defaultAccount = doctor1
+w3.personal.unlockAccount(doctor1, "pass", 15000)
+delete_first_patientB(doctor1)
+#delete_first_patientB(doctor2)
 get_patients()
+
+def get_accounts():
+    admin = [{'name':'ADMIN','address':ADMIN}]
+    return doctors+receptionists+admin
 
 app = Flask(__name__, template_folder='./templates')
 
 @app.route('/')
 def index():
-    return render_template('index.html', queue=get_patients(), user=w3.eth.defaultAccount, accounts=[doctor1,doctor2,receptionist]), 200
+    return render_template('index.html', queue=get_patients(), user=w3.eth.defaultAccount, accounts=get_accounts(), doctors=doctors), 200
+
+@app.route('/add_doctor', methods=['POST'])
+def add_doctor():
+    values = request.form
+
+    # Check that the required fields are in the POST'ed data
+    required = ['name']
+    if not all(k in values for k in required):
+        return 'Missing values', 400
+
+    name = values['name']
+    create_doctor(name)
+    return render_template('index.html', queue=get_patients(), user=w3.eth.defaultAccount, accounts=get_accounts(), doctors=doctors), 200
 
 
 @app.route('/set_user', methods=['POST'])
-def add_patient():
+def set_user():
     values = request.form
 
     # Check that the required fields are in the POST'ed data
@@ -226,16 +252,72 @@ def add_patient():
     # w3.personal.unlockAccount(w3.personal.listAccounts[0], "", 15000)
     #add_patient_to_queue(patient_name)
 
-    return render_template('index.html', queue=get_patients(), user=w3.eth.defaultAccount, accounts=[doctor1,doctor2,receptionist]), 201
+    return render_template('index.html', queue=get_patients(), user=w3.eth.defaultAccount, accounts=get_accounts(), doctors=doctors), 201
+
+
+@app.route('/next_patient', methods=['POST'])
+def next_patient():
+    values = request.form
+
+    # Check that the required fields are in the POST'ed data
+    # required = ['user']
+    # if not all(k in values for k in required):
+    #     return 'Missing values', 400
+    #
+    # user = values['user']
+    w3.personal.unlockAccount(w3.eth.defaultAccount, "pass", 15000)
+    delete_first_patientB(w3.eth.defaultAccount)
+    # w3.personal.unlockAccount(w3.personal.listAccounts[0], "", 15000)
+    #add_patient_to_queue(patient_name)
+
+    return render_template('index.html', queue=get_patients(), user=w3.eth.defaultAccount, accounts=get_accounts(), doctors=doctors), 201
+
+@app.route('/delete_middle_patient', methods=['POST'])
+def delete_middle_patient():
+    values = request.form
+
+    required = ['doctor', 'id']
+    if not all(k in values for k in required):
+        return 'Missing values', 400
+
+    doctor = values['doctor']
+    id = values['id']
+    w3.personal.unlockAccount(w3.eth.defaultAccount, "pass", 15000)
+    delete_patient(doctor,int(id))
+    # w3.personal.unlockAccount(w3.personal.listAccounts[0], "", 15000)
+    #add_patient_to_queue(patient_name)
+
+    return render_template('index.html', queue=get_patients(), user=w3.eth.defaultAccount, accounts=get_accounts(), doctors=doctors), 201
+
+
+@app.route('/add_patient', methods=['POST'])
+def add_patient_response():
+    values = request.form
+
+    # Check that the required fields are in the POST'ed data
+    required = ['doctor','name']
+    if not all(k in values for k in required):
+        return 'Missing values', 400
+
+    name = values['name']
+    doctor = values['doctor']
+    add_patient(doctor, name)
+    return render_template('index.html', queue=get_patients(), user=w3.eth.defaultAccount, accounts=get_accounts(), doctors=doctors), 200
+
+@app.route('/add_visit', methods=['POST'])
+def add_visit_response():
+    values = request.form
+
+    # Check that the required fields are in the POST'ed data
+    required = ['doctor','id']
+    if not all(k in values for k in required):
+        return 'Missing values', 400
+
+    id = values['id']
+    doctor = values['doctor']
+    add_visit(int(id), doctor, 0)
+    return render_template('index.html', queue=get_patients(), user=w3.eth.defaultAccount, accounts=get_accounts(), doctors=doctors), 200
+
+
 
 app.run(host='0.0.0.0', port=5000)
-
-
-# tx_hash = queue.functions.enqueue("Damian").transact()
-# w3.eth.waitForTransactionReceipt(tx_hash)
-#
-# print('Size: {}'.format(queue.functions.lenght().call()))
-#
-# print('First test user: {}'.format(
-#     queue.functions.dequeue().call()
-# ))

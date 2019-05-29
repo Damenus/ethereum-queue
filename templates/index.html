@@ -12,7 +12,7 @@
     <form action="/set_user" method="POST" >
         <select name="user" onchange="this.form.submit()">
             {% for account in accounts %}
-            <option value='{{account}}'>{{ account }}</option>
+            <option value='{{account.address}}'>{{ account.address }} {{ account.name }}</option>
             {% endfor %}
          </select>
     </form>
@@ -20,16 +20,61 @@
 
     {% for doctor in queue %}
     {{doctor.name}}
-
+    <form action="/next_patient" method="POST" >
+        <input type="submit" value="Next patient">
+    </form>
 
     <ul>
         {% for patient in doctor.patients %}
         <li {% if patient.id == doctor.next_patient %} style="color:red;" {% endif %}>
-            {{ patient.patients_name }}
+            {{ patient.id }} {{ patient.patients_name }}
         </li>
         {% endfor %}
     </ul>
     {% endfor %}
+
+    ADD DOCTOR
+    <form action="/add_doctor" method="POST" >
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required>
+        <input type="submit" value="New doctor">
+    </form>
+
+    DELETE PATIENT
+    <form action="/delete_middle_patient" method="POST" >
+        <label for="id">ID:</label>
+        <input type="text" id="id" name="id" required>
+        <select name="doctor">
+            {% for doctor in doctors %}
+            <option value='{{doctor.address}}'>{{ doctor.name }}</option>
+            {% endfor %}
+         </select>
+        <input type="submit" value="Delete">
+    </form>
+
+    ADD PATIENT
+    <form action="/add_patient" method="POST" >
+        <label for="name2">Name:</label>
+        <input type="text" id="name2" name="name" required>
+        <select name="doctor">
+            {% for doctor in doctors %}
+            <option value='{{doctor.address}}'>{{ doctor.name }}</option>
+            {% endfor %}
+         </select>
+        <input type="submit" value="Add">
+    </form>
+
+    ADD VISIT
+    <form action="/add_visit" method="POST" >
+        <label for="id2">ID:</label>
+        <input type="text" id="id2" name="id" required>
+        <select name="doctor">
+            {% for doctor in doctors %}
+            <option value='{{doctor.address}}'>{{ doctor.name }}</option>
+            {% endfor %}
+         </select>
+        <input type="submit" value="Add">
+    </form>
 
 
 {% if response is defined %}
