@@ -81,7 +81,7 @@ contract MedicalQueue {
     address[] doctorList;
 
 
-    function newPatient(address addressDoctor, string memory namePatient) public returns(bool success) {
+    function newPatient(address addressDoctor, string memory namePatient) public onlyByRole(Role.RECEPTIONIST) returns(bool success) {
         patientStructs[numberPatients].namePatient = namePatient;
         patientStructs[numberPatients].addressDoctor.push(addressDoctor);
         patientStructs[numberPatients].listPointer.push(doctorListStruct[addressDoctor].patients.push(numberPatients) - 1);
@@ -135,7 +135,7 @@ contract MedicalQueue {
         return true;
     }
 
-    function deletePatient(uint idPatient) public returns(bool success) {
+    function deletePatient(uint idPatient) public onlyByRole(Role.RECEPTIONIST) returns(bool success) {
 
         address doctorListToDelete = patientStructs[idPatient].addressDoctor[0];
         uint patientToDelete = patientStructs[idPatient].listPointer[0];
@@ -155,14 +155,6 @@ contract MedicalQueue {
     }
 
     function deleteFirstPatient(address addressDoctor) public returns(bool success) {
-
-        //test ktorego usunac
-        uint idPatient = doctorListStruct[addressDoctor].patients[0];
-        deletePatient2(addressDoctor, idPatient);
-        return true;
-    }
-
-    function deleteFirstPatientB(address addressDoctor) public returns(bool success) {
         require(addressDoctor == msg.sender);
         uint idPatient = 0;
         for(uint i=0; i < doctorListStruct[addressDoctor].patients.length; i++){
@@ -202,7 +194,7 @@ contract MedicalQueue {
         patientStructs[idPatient].addressDoctor.push(addressDoctor);
         patientStructs[idPatient].listPointer.push(doctorListStruct[addressDoctor].patients.push(idPatient) - 1);
 
-        // trzeba whila i wstawić w dobre miejsce
+        // trzeba whila i wstawic w dobre miejsce
 //        uint last = patientStructs[idPatient].addressDoctor.length - 1;
 //        uint current = idVisit;
 //

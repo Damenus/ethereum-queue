@@ -167,22 +167,21 @@ add_visit(1, doctor2, 1);
 add_patient(doctor2, "BasiaDoctor2")
 add_visit(2, doctor2, 1);
 
-def delete_first_patient(address_doctor):
+
+def delete_first_patientB(address_doctor):
     tx_hash = queue.functions.deleteFirstPatient(address_doctor).transact()
     w3.eth.waitForTransactionReceipt(tx_hash)
 
-def delete_first_patientB(address_doctor):
-    tx_hash = queue.functions.deleteFirstPatientB(address_doctor).transact()
-    w3.eth.waitForTransactionReceipt(tx_hash)
 
 def get_next_patient(address_doctor):
     tx_hash = queue.functions.getNextPatient(address_doctor).call()
-    #w3.eth.waitForTransactionReceipt(tx_hash)
-    return  tx_hash
+    return tx_hash
+
 
 def delete_patient(address_doctor,id):
     tx_hash = queue.functions.deletePatient2(address_doctor, id).transact()
     w3.eth.waitForTransactionReceipt(tx_hash)
+
 
 def get_patients():
     number_doctors = queue.functions.getNumberDoctors().call()
