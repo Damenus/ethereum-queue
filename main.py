@@ -6,7 +6,7 @@ from flask import Flask, jsonify, request, render_template
 
 # from web3.auto.gethdev import w3
 from web3 import Web3, IPCProvider
-from solc import compile_source
+from solcx import compile_source
 from web3.middleware import geth_poa_middleware
 
 def compile_source_file(file_path):
@@ -179,7 +179,7 @@ def get_next_patient(address_doctor):
 
 
 def delete_patient(address_doctor,id):
-    tx_hash = queue.functions.deletePatient2(address_doctor, id).transact()
+    tx_hash = queue.functions.deletePatientReceptionist(address_doctor, id).transact()
     w3.eth.waitForTransactionReceipt(tx_hash)
 
 
@@ -222,6 +222,21 @@ app = Flask(__name__, template_folder='./templates')
 def index():
     return render_template('index.html', queue=get_patients(), user=w3.eth.defaultAccount, accounts=get_accounts(), doctors=doctors), 200
 
+@app.route('/admin')
+def admin():
+    w3.eth.defaultAccount = ADMIN
+    return render_template('admin.html', queue=get_patients(), user=w3.eth.defaultAccount, accounts=ADMIN, doctors=doctors), 200
+
+@app.route('/receptionist')
+def receptionist():
+    w3.eth.defaultAccount = receptionist
+    return render_template('receptionist.html', queue=get_patients(), user=w3.eth.defaultAccount, accounts=str(receptionist), doctors=doctors), 200
+
+@app.route('/doctor')
+def doctor():
+    return render_template('doctor.html', queue=get_patients(), user=w3.eth.defaultAccount, accounts=doctors, doctors=doctors), 200
+
+
 @app.route('/add_doctor', methods=['POST'])
 def add_doctor():
     values = request.form
@@ -258,14 +273,14 @@ def set_user():
 def next_patient():
     values = request.form
 
-    # Check that the required fields are in the POST'ed data
-    # required = ['user']
-    # if not all(k in values for k in required):
-    #     return 'Missing values', 400
-    #
-    # user = values['user']
+
+    required = ['address']
+    if not all(k in values for k in required):
+        return 'Missing values', 400
+
+    address = values['address']
     w3.personal.unlockAccount(w3.eth.defaultAccount, "pass", 15000)
-    delete_first_patientB(w3.eth.defaultAccount)
+    delete_first_patientB(address)
     # w3.personal.unlockAccount(w3.personal.listAccounts[0], "", 15000)
     #add_patient_to_queue(patient_name)
 

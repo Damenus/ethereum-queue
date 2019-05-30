@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %} Index {% endblock %}
+{% block head %}
+ {{ super() }}
+{% endblock %}
+
+{% block body %}
+    {{ super() }}
+
+    {{ user }}
+
+    <ul>
+    {% for doctor in queue %}
+        <li>{{doctor.name}}</li>
+    {% endfor %}
+    </ul>
+    ADD DOCTOR
+    <form action="/add_doctor" method="POST" >
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required>
+        <input type="submit" value="New doctor">
+    </form>
+
+
+{% if response is defined %}
+    {{ response['message'] }}
+{% endif %}
+
+{% endblock %}

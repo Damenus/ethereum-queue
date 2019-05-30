@@ -7,7 +7,7 @@ name = "pypi"
 web3 = "*"
 py-solc = "*" # wrapper to solc, soldity compiler
 eth-testrpc = "*"
-py-solcx = "*"
+py-solc-x = "*"
 pickle = "*"
 flask = "*"
 

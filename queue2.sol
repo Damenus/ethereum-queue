@@ -93,7 +93,12 @@ contract MedicalQueue {
         name = patientStructs[idPatient].namePatient;
     }
 
-    function deletePatient2(address addressDoctor, uint idPatient) public returns(bool success) {
+    function deletePatientReceptionist(address addressDoctor, uint idPatient) public onlyByRole(Role.RECEPTIONIST) returns(bool success) {
+        deletePatient2(addressDoctor, idPatient);
+        return true;
+    }
+
+    function deletePatient2(address addressDoctor, uint idPatient) returns(bool success) {
         uint id = 0; // ktory na liscu jest lekarz w zabiegu
         for(uint x = 0; x < patientStructs[idPatient].addressDoctor.length; x++) {
             if(patientStructs[idPatient].addressDoctor[x] == addressDoctor) {

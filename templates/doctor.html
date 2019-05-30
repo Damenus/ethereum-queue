@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %} Index {% endblock %}
+{% block head %}
+ {{ super() }}
+{% endblock %}
+
+{% block body %}
+    {{ super() }}
+
+    {{ user }}
+
+    <form action="/set_user" method="POST" >
+        <select name="user" onchange="this.form.submit()">
+            {% for account in accounts %}
+            <option value='{{account.address}}'>{{ account.address }} {{ account.name }}</option>
+            {% endfor %}
+         </select>
+    </form>
+
+
+    {% for doctor in queue %}
+    {{doctor.name}}
+    <form action="/next_patient" method="POST" >
+        <input type="submit" value="Next patient">
+    </form>
+
+    <ul>
+        {% for patient in doctor.patients %}
+        <li {% if patient.id == doctor.next_patient %} style="color:red;" {% endif %}>
+            {{ patient.id }} {{ patient.patients_name }}
+        </li>
+        {% endfor %}
+    </ul>
+    {% endfor %}
+
+
+{% if response is defined %}
+    {{ response['message'] }}
+{% endif %}
+
+{% endblock %}

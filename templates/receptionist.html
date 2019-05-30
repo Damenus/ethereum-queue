@@ -9,20 +9,9 @@
 
     {{ user }}
 
-    <form action="/set_user" method="POST" >
-        <select name="user" onchange="this.form.submit()">
-            <option value=''></option>
-            {% for account in accounts %}
-            <option value='{{account.address}}'>{{ account.address }} {{ account.name }}</option>
-            {% endfor %}
-         </select>
-    </form>
-
-
     {% for doctor in queue %}
     {{doctor.name}}
     <form action="/next_patient" method="POST" >
-        <input type="hidden" name="address" value="{{doctor.address}}">
         <input type="submit" value="Next patient">
     </form>
 
@@ -34,13 +23,6 @@
         {% endfor %}
     </ul>
     {% endfor %}
-
-    ADD DOCTOR
-    <form action="/add_doctor" method="POST" >
-        <label for="name">Name:</label>
-        <input type="text" id="name" name="name" required>
-        <input type="submit" value="New doctor">
-    </form>
 
     DELETE PATIENT
     <form action="/delete_middle_patient" method="POST" >
