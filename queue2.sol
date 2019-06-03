@@ -98,7 +98,7 @@ contract MedicalQueue {
         return true;
     }
 
-    function deletePatient2(address addressDoctor, uint idPatient) returns(bool success) {
+    function deletePatient2(address addressDoctor, uint idPatient) private returns(bool success) {
         uint id = 0; // ktory na liscu jest lekarz w zabiegu
         for(uint x = 0; x < patientStructs[idPatient].addressDoctor.length; x++) {
             if(patientStructs[idPatient].addressDoctor[x] == addressDoctor) {
