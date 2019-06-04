@@ -22,6 +22,7 @@ add-apt-repository -y ppa:ethereum/ethereum
 apt-get update
 apt-get install ethereum geth python3.6 python3.6-dev python3.6-pip wget
 pipenv install
+pipenv run python3 main.py
 #pip install py-solc
 #pip install py-solc-x
 #python -m solc.install v0.4.25
